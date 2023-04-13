@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{url_for('static',filename='favicon.ico')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='src/main.css')}}">
+    <title>Hello world</title>
+</head>
+
+<body class="mx-2 bg-gray-100 md:mx-0 flex- flex-col">
+    <main class="max-w-7xl mx-auto mt-2 flex flex-col items-center">
+        <h1 class="text-gray-700 font-normal text-2xl  font-roboto">{{heading}} duck</h1>
+        <img class="rounded shadow-lg shadow-gray-700" src="{{url_for('static',filename='/images/800x600.jpg')}}"
+            alt="main image" width="600" height="400">
+        <h2 class="my-2 text-lg">About heck</h2>
+        <p class="text-justify max-w-5xl">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Unde voluptate rem
+            sit voluptatibus. Id molestiae
+            veniam, quae tempora aliquam itaque atque deserunt et rem repudiandae fugiat assumenda dolore omnis
+            incidunt. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolorum, blanditiis magni? Cumque
+            veritatis sequi quam! In a iste quae est, reiciendis repellendus, amet, quibusdam at delectus doloremque
+            accusamus culpa debitis.
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Enim et cum tenetur dolorum voluptatibus, nemo
+            sunt corrupti! Reiciendis aliquid delectus pariatur quae impedit sint optio aspernatur ex dolore soluta!
+            Corporis.
+        </p>
+        <h2 class="text-lg">Open position</h2>
+        <div class="min-w-[500px]">
+            {% for job in jobs %}
+            {% include 'jobItems.html' %}
+            {% endfor %}
+        </div>
+        <button
+            class="mt-2 border rounded text-gray-700 bg-blue-300 px-2 py-1 hover:bg-blue-400 transition-all active:bg-blue-500">Contact
+            us</button>
+    </main>
+    {% include 'footer.html' %}
+</body>
+
+</html>
