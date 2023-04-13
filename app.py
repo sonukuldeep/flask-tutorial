@@ -1,50 +1,78 @@
-from flask import Flask, render_template,jsonify
+from flask import Flask, render_template, jsonify, send_from_directory, request, redirect, url_for
+from os import path
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 app = Flask(__name__)
+# create the extension
+db = SQLAlchemy()
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///project.db"
+# initialize the app with the extension
+db.init_app(app)
+
+
+class Todo(db.Model):
+    sno = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    desc = db.Column(db.String(500), nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self) -> str:
+        return f'{self.title} - {self.desc}'
+
+
 HOST = '127.0.0.1'
 PORT = '3000'
 
-JOBS = [
-    {
-        'id': 1,
-        'title': 'Data analyst',
-        'salary': 'Rs 10,00,000',
-        'location': 'Delhi'
-    },
-    {
-        'id': 2,
-        'title': 'Data scientist',
-        'salary': 'Rs 12,00,000',
-        'location': 'Banglore'
-    },
-    {
-        'id': 3,
-        'title': 'Backend engineer',
-        'salary': 'Rs 15,00,000',
-        'location': 'Chennai'
-    },
-    {
-        'id': 4,
-        'title': 'Frontend enginee',
-        'salary': 'Rs 14,00,000,',
-        'location': 'Kolkata'
-    }
-]
+# run only once
+# with app.app_context():
+#     db.create_all()
 
 
-@app.route('/')  # root route
-def hello_world():
-    return render_template('home.html', jobs=JOBS, heading='Whats up')
+@app.route('/', methods=['GET', 'POST'])  # root route
+@app.route('/home', methods=['GET', 'POST'])
+def home_page():
+    if request.method == 'POST':
+        title = request.form['title']
+        desc = request.form['desc']
+        todo = Todo(title=title, desc=desc)
+        db.session.add(todo)
+        db.session.commit()
 
-@app.route('/api/jobs') # static route
-def list_jobs():
-    return jsonify(JOBS)
+    allTodo = Todo.query.all()
+    return render_template('home.html', allTodo=allTodo)
 
-@app.route('/about/<username>') # dynamic route
+
+@app.route("/delete/<int:sno>")
+def delete(sno):
+    todo = db.get_or_404(Todo, sno)
+    db.session.delete(todo)
+    db.session.commit()
+    # return f'user {sno} deleted'
+    return redirect(url_for("home_page"))
+
+@app.route("/update/<int:sno>", methods=['GET', 'POST'])
+def update(sno):
+    if request.method == 'POST':
+        todo = db.get_or_404(Todo, sno)
+
+
+
+@app.route('/show')  # static route
+def products():
+    allTodo = Todo.query.all()
+    print(allTodo)
+    return 'this is products page'
+
+
+@app.route('/about/<username>')  # dynamic route
 def about_page(username):
     return f'<h4>This is about page of {username}</h4>'
 
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 if __name__ == '__main__':
