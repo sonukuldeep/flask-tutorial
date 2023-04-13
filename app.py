@@ -48,26 +48,19 @@ def delete(sno):
     todo = db.get_or_404(Todo, sno)
     db.session.delete(todo)
     db.session.commit()
-    # return f'user {sno} deleted'
     return redirect(url_for("home_page"))
 
 @app.route("/update/<int:sno>", methods=['GET', 'POST'])
 def update(sno):
+    todo = db.get_or_404(Todo, sno)
     if request.method == 'POST':
-        todo = db.get_or_404(Todo, sno)
+        todo.title = request.form['title']
+        todo.desc = request.form['desc']
+        db.session.add(todo)
+        db.session.commit()
+        return redirect(url_for("home_page"))
 
-
-
-@app.route('/show')  # static route
-def products():
-    allTodo = Todo.query.all()
-    print(allTodo)
-    return 'this is products page'
-
-
-@app.route('/about/<username>')  # dynamic route
-def about_page(username):
-    return f'<h4>This is about page of {username}</h4>'
+    return render_template('update.html', todo=todo)
 
 
 @app.route('/favicon.ico')
